@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Custom Alexa Smart Display for Samsung Galaxy J6 with Bluetooth Audio & Hinglish AI">
+  <meta name="theme-color" content="#07090e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Alexa Smart Display</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="landscape-mode">
+  <!-- Ambient Background Glows -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-particles" id="ambientParticles"></div>
+
+  <!-- Main Smart Display Container -->
+  <div class="display-container" id="displayContainer">
+    
+    <!-- Top Status Bar -->
+    <header class="top-bar">
+      <div class="brand-badge">
+        <div class="alexa-dot"></div>
+        <span class="brand-name">echo <strong>display</strong></span>
+        <span class="device-tag">Galaxy J6 Edition</span>
+      </div>
+
+      <div class="status-group">
+        <div class="status-chip" id="btStatusChip" title="Bluetooth Speaker Status">
+          <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"/>
+          </svg>
+          <span id="btStatusText">BT Speaker</span>
+        </div>
+
+        <div class="status-chip" id="networkChip">
+          <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+            <circle cx="12" cy="20" r="1" fill="currentColor"/>
+          </svg>
+          <span id="networkText">Online</span>
+        </div>
+
+        <div class="status-chip" id="batteryChip">
+          <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="16" height="10" rx="2" ry="2"/>
+            <line x1="22" y1="11" x2="22" y2="13"/>
+            <rect id="batteryLevelBar" x="4" y="9" width="10" height="6" fill="currentColor"/>
+          </svg>
+          <span id="batteryText">--%</span>
+        </div>
+
+        <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" id="fullscreenBtn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Grid (Landscape Split) -->
+    <main class="main-grid">
+      
+      <!-- Left Column: Clock, Date, Weather & Ambient Info -->
+      <section class="hero-section">
+        <div class="time-block">
+          <div class="clock-display" id="clockDisplay">
+            <span class="clock-digits" id="clockHours">12</span>
+            <span class="clock-colon">:</span>
+            <span class="clock-digits" id="clockMinutes">00</span>
+            <span class="clock-seconds" id="clockSeconds">00</span>
+            <span class="clock-period" id="clockPeriod">PM</span>
+          </div>
+          <div class="date-display" id="dateDisplay">
+            <span class="date-day" id="dateDay">Tuesday</span>
+            <span class="date-separator">•</span>
+            <span class="date-full" id="dateFull">20 October 2026</span>
+          </div>
+        </div>
+
+        <!-- Weather Widget (Free Open-Meteo API) -->
+        <div class="weather-card glass-panel" id="weatherCard">
+          <div class="weather-main">
+            <div class="weather-icon-wrapper" id="weatherIconWrapper">
+              <span class="weather-temp-icon" id="weatherIcon">☀️</span>
+            </div>
+            <div class="weather-temp-group">
+              <span class="weather-temp" id="weatherTemp">28°</span>
+              <span class="weather-condition" id="weatherCondition">Clear Sky</span>
+            </div>
+          </div>
+          <div class="weather-details">
+            <div class="weather-sub" id="weatherCity">Mumbai, India</div>
+            <div class="weather-stats">
+              <span>H: <strong id="weatherHigh">31°</strong></span>
+              <span>L: <strong id="weatherLow">24°</strong></span>
+              <span>💧 <strong id="weatherHumidity">65%</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ambient Voice Suggestions Carousel -->
+        <div class="prompt-suggestions glass-panel">
+          <div class="suggestion-header">
+            <svg class="alexa-icon-mini" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 7a5 5 0 1 0 5 5"/>
+            </svg>
+            <span>Try Saying:</span>
+          </div>
+          <div class="suggestion-ticker" id="suggestionTicker">
+            <span class="ticker-text" id="tickerText">"Alexa, time kya hua hai?"</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Voice & Assistant Display -->
+      <section class="assistant-section">
+        
+        <!-- Assistant Visualizer & Status Area -->
+        <div class="assistant-card glass-panel" id="assistantCard">
+          
+          <div class="assistant-header">
+            <div class="status-indicator-pill" id="statusPill">
+              <span class="status-dot" id="statusDot"></span>
+              <span class="status-label" id="statusLabel">Listening for "Alexa"...</span>
+            </div>
+
+            <div class="mode-badge" id="modeBadge" title="Hybrid Engine Mode">
+              <span class="mode-icon">⚡</span>
+              <span id="modeText">Hybrid Mode (Local + AI)</span>
+            </div>
+          </div>
+
+          <!-- Central Glowing Orb / Visualizer -->
+          <div class="visualizer-container" id="visualizerContainer">
+            <div class="alexa-glow-ring" id="alexaRing">
+              <div class="ring-core">
+                <button class="mic-toggle-btn" id="micToggleBtn" aria-label="Activate Assistant">
+                  <svg class="mic-icon" id="micSvgIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="ring-pulse"></div>
+              <div class="ring-spin"></div>
+            </div>
+
+            <!-- Audio Spectrum Equalizer (Reactive to TTS & Voice) -->
+            <div class="audio-equalizer" id="audioEqualizer">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+          </div>
+
+          <!-- Live Conversation Bubble Area -->
+          <div class="conversation-stream" id="conversationStream">
+            
+            <!-- User Recognized Speech Card -->
+            <div class="speech-bubble user-bubble" id="userBubble">
+              <div class="bubble-tag">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>You said</span>
+              </div>
+              <div class="bubble-content" id="userTranscript">Say "Alexa" or tap the mic to speak...</div>
+            </div>
+
+            <!-- Alexa Response Card -->
+            <div class="speech-bubble alexa-bubble" id="alexaBubble">
+              <div class="bubble-tag">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 7a5 5 0 1 0 5 5"/>
+                </svg>
+                <span>Alexa</span>
+                <span class="source-tag" id="responseSourceTag">Offline Ready</span>
+              </div>
+              <div class="bubble-content" id="alexaResponse">
+                Namaste! Main aapka Alexa assistant hoon. Main offline time, date, aur calculations jaise sawal turant bata sakti hoon, aur online sawalo ka AI se jawab de sakti hoon.
+              </div>
+              <div class="bubble-actions">
+                <button class="action-chip" id="replaySpeechBtn" title="Replay Audio">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  </svg>
+                  <span>Replay</span>
+                </button>
+                <button class="action-chip" id="stopSpeechBtn" title="Stop Audio">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="1"/>
+                  </svg>
+                  <span>Stop</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Dynamic Result Card (for math/quick widgets) -->
+            <div class="result-card" id="dynamicResultCard" style="display: none;">
+              <div class="result-header" id="resultCardHeader">Calculation</div>
+              <div class="result-body" id="resultCardBody">--</div>
+            </div>
+
+          </div>
+
+          <!-- Quick Command Shortcuts / Chips -->
+          <div class="quick-chips-row">
+            <button class="quick-chip" data-cmd="Alexa, time kya hua hai?">🕒 Time</button>
+            <button class="quick-chip" data-cmd="Alexa, aaj konsi date hai?">📅 Date</button>
+            <button class="quick-chip" data-cmd="Alexa, 125 plus 375 kitna hota hai?">🧮 Math</button>
+            <button class="quick-chip" data-cmd="Alexa, ek majedaar joke sunao">😄 Joke</button>
+            <button class="quick-chip" data-cmd="Alexa, tum kaun ho?">🤖 About</button>
+            <button class="quick-chip" id="testVoiceBtn" style="border-color: var(--alexa-cyan); color: var(--alexa-cyan);">🔊 Test Voice</button>
+          </div>
+
+          <!-- Quick Text Input Bar (Great for PC testing & quiet environments) -->
+          <form class="text-input-bar" id="textInputForm">
+            <input type="text" id="manualCommandInput" placeholder="Type a command (e.g. 'Alexa, time kya hua?') or click mic..." autocomplete="off">
+            <button type="submit" class="send-btn" id="sendBtn" title="Send Command" aria-label="Send">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </form>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Alexa Ambient Bottom Light Bar -->
+    <div class="alexa-bottom-lightbar" id="bottomLightBar">
+      <div class="light-beam cyan-beam"></div>
+      <div class="light-beam blue-beam"></div>
+    </div>
+
+  </div>
+
+  <!-- Settings Modal Dialog -->
+  <div class="modal-overlay" id="settingsModal" style="display: none;">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <h3>Smart Display Settings</h3>
+        </div>
+        <button class="close-modal-btn" id="closeSettingsBtn" aria-label="Close Settings">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Gemini API Key Section -->
+        <div class="setting-item">
+          <label for="geminiApiKeyInput">
+            <strong>Google Gemini API Key</strong> (Free AI Tier)
+            <span class="setting-desc">Required for open-ended Hinglish AI conversations. Get free key from <a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a> (100% Free, no credit card required).</span>
+          </label>
+          <div class="input-with-action">
+            <input type="password" id="geminiApiKeyInput" placeholder="Paste your AI Studio API key here...">
+            <button class="btn-subtle" id="toggleApiKeyVisibility">Show</button>
+          </div>
+        </div>
+
+        <!-- AI Model Selection -->
+        <div class="setting-item">
+          <label for="aiModelSelect">
+            <strong>AI Model</strong>
+            <span class="setting-desc">Fast free-tier models optimized for voice answers.</span>
+          </label>
+          <select id="aiModelSelect">
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Recommended - Free Tier Standard)</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen Fast)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Detailed Analysis)</option>
+          </select>
+        </div>
+
+        <!-- City for Weather -->
+        <div class="setting-item">
+          <label for="weatherCityInput">
+            <strong>Location for Weather</strong>
+            <span class="setting-desc">Enter your city (e.g., Delhi, Mumbai, Bengaluru, Lucknow, Jaipur).</span>
+          </label>
+          <input type="text" id="weatherCityInput" value="Mumbai" placeholder="Enter City Name">
+        </div>
+
+        <!-- Voice Accent Preference -->
+        <div class="setting-item">
+          <label for="voiceSelect">
+            <strong>Assistant Voice Output</strong>
+            <span class="setting-desc">Choose TTS voice for Bluetooth speaker playback.</span>
+          </label>
+          <select id="voiceSelect">
+            <option value="auto">Auto (Hindi / Indian English Voice)</option>
+          </select>
+        </div>
+
+        <!-- Keep Screen Awake Toggle -->
+        <div class="setting-item toggle-item">
+          <div class="toggle-text">
+            <strong>Keep Screen Awake (Always-On Display)</strong>
+            <span class="setting-desc">Prevents Galaxy J6 screen from turning off while docked.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="keepAwakeToggle" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- Wake Word Always Listening Toggle -->
+        <div class="setting-item toggle-item">
+          <div class="toggle-text">
+            <strong>Continuous Wake Word Listening</strong>
+            <span class="setting-desc">Continuously monitors mic for the word "Alexa".</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="continuousListeningToggle" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- Audio Output info -->
+        <div class="setting-info-box">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <div>
+            <strong>Bluetooth Speaker Audio:</strong> Pair your Bluetooth speaker directly in the Samsung Galaxy J6 Android Bluetooth settings. All spoken responses and chimes will automatically route to your speaker!
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" id="saveSettingsBtn">Save & Apply Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Chimes & Synthesis Elements -->
+  <audio id="wakeChime" preload="auto"></audio>
+
+  <!-- Application Scripts (Versioned to bypass cache) -->
+  <script src="audio_synth.js?v=4"></script>
+  <script src="local_commands.js?v=4"></script>
+  <script src="ai_service.js?v=4"></script>
+  <script src="app.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Alexa Smart Display",
+  "short_name": "Alexa",
+  "description": "Custom Alexa Smart Display for Samsung Galaxy J6 with Bluetooth Audio & Hinglish AI",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#05070a",
+  "theme_color": "#07090e",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%2305070a' stroke='%2300caff' stroke-width='4'/><circle cx='50' cy='50' r='24' fill='%2300caff'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
